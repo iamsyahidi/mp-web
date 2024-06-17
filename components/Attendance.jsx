@@ -17,6 +17,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Input, FormControl, FormLabel } from "@/components/ui/input";
 
 export function Attendance() {
   const router = useRouter();
@@ -26,6 +27,9 @@ export function Attendance() {
   const [message, setMessage] = useState("");
   const [attendanceData, setAttendanceData] = useState([]);
   const [totalWorkDuration, setTotalWorkDuration] = useState(0);
+  const [from, setFrom] = useState("");
+  const [to, setTo] = useState("");
+  const [sendFilter, setSendFilter] = useState(false);
 
   const handleCheckin = async () => {
     const accessToken = localStorage.getItem("accessToken");
@@ -115,7 +119,7 @@ export function Attendance() {
     const fetchAttendanceData = async () => {
       const accessToken = localStorage.getItem("accessToken");
       const url = new URL(
-        `/attendances/reports`,
+        `/attendances/reports?from=${from}&to=${to}`,
         `http://${process.env.NEXT_PUBLIC_GENERAL_SERVICE_HOST}:${process.env.NEXT_PUBLIC_GENERAL_SERVICE_PORT}`
       );
       try {
@@ -142,7 +146,7 @@ export function Attendance() {
     };
 
     fetchAttendanceData();
-  }, [router]);
+  }, [router, from, to]);
 
   return (
     <Card>
@@ -163,23 +167,39 @@ export function Attendance() {
         )}
       </CardHeader>
       <CardContent>
-        {/* <div className="flex justify-between"> */}
-          <Button
-            variant="outline"
-            startIcon={<CalendarPlusIcon />}
-            onClick={handleCheckin}
-          >
-            Check-in
-          </Button>
-          <Button
-            variant="outline"
-            startIcon={<CalendarMinusIcon />}
-            onClick={handleCheckout}
-            className="mt-4"
-          >
-            Check-out
-          </Button>
-        {/* </div> */}
+        <div className="grid gap-4">
+          <div className="grid gap-2">
+            <Label>From</Label>
+            <Input
+              type="date"
+              value={from}
+              onChange={(e) => setFrom(e.target.value)}
+            />
+          </div>
+          <div className="grid gap-2">
+            <Label>To</Label>
+            <Input
+              type="date"
+              value={to}
+              onChange={(e) => setTo(e.target.value)}
+            />
+          </div>
+        </div>
+        <Button
+          variant="outline"
+          startIcon={<CalendarPlusIcon />}
+          onClick={handleCheckin}
+        >
+          Check-in
+        </Button>
+        <Button
+          variant="outline"
+          startIcon={<CalendarMinusIcon />}
+          onClick={handleCheckout}
+          className="mt-4"
+        >
+          Check-out
+        </Button>
         <Table>
           <TableCaption>A list of your current month attendance</TableCaption>
           <TableHeader>
@@ -213,4 +233,3 @@ export function Attendance() {
     </Card>
   );
 }
-
